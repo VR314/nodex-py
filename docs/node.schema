@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "command": {
+      "type": "string"
+    },
+    "runtime_args": {
+      "type": "array",
+      "items": {
+        "items": {},
+        "additionalItems": true,
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "init_port": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "project",
+    "name",
+    "language",
+    "command",
+    "runtime_args",
+    "init_port"
+  ]
+}

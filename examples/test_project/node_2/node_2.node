@@ -1,0 +1,8 @@
+{
+  "project": "test_project",
+  "name": "node_2",
+  "language": "nodejs",
+  "command": "npm start",
+  "runtime_args": [],
+  "init_port": 38837
+}

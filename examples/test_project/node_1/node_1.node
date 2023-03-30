@@ -1,0 +1,8 @@
+{
+  "project": "test_project",
+  "name": "node_1",
+  "language": "python",
+  "command": "python3 node_1.py",
+  "runtime_args": [],
+  "init_port": 44431
+}

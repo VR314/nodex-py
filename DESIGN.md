@@ -14,6 +14,17 @@ Created project in <directory>!
 
 ```
 
+Project structure should be as follows:
+  project_name
+    ├── node_1
+    │   ├── node_1.node
+    │   └── node_1.py
+    └── node_2
+        ├── index.js
+        ├── node_2.node
+        └── package.json
+
+
 ```
 > nodex node new <project-root> <name> -c <config file>
 Enter your node's name:
