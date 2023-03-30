@@ -1,1 +1,3 @@
 src/nodex-venv
+*.pyc
+__pycache__/

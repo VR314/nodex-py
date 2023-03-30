@@ -1,9 +1,19 @@
 import zmq
 
-context = zmq.Context()
+class Connection:
+    def __init__(self, endpoint):
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.PAIR)        
+        if endpoint is None:   
+          endpoint = self.socket.getsockopt(zmq.LAST_ENDPOINT).decode()
+        else: 
+          self.endpoint = endpoint
+        self.socket.connect(self.endpoint)
+        print("Connected to endpoint from connection:", self.endpoint)
 
-socket = context.socket(zmq.REP)
-socket.bind("tcp://*:0")  # Bind to a random available port
+    def send(self, message):
+        self.socket.send_string(message)
+        print("Sent message: " +  message)
 
-endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
-print("Bound to endpoint:", endpoint)
+    def __str__(self):
+        return f"Connection(endpoint={self.endpoint})"

@@ -1,5 +1,6 @@
 import argparse
 import os
+import zmq
 
 def is_int(value):
     try:
@@ -27,6 +28,25 @@ def new_connect(args):
 
 def run_nodes(args):
     print(f"Running nodes: {args.nodes}")
+    context = zmq.Context()
+
+    socket = context.socket(zmq.PAIR)
+    socket.bind("tcp://0.0.0.0:4501")  # Bind to a random available port
+
+    endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
+
+    print("Bound to endpoint from run:", endpoint)
+
+    # Set a timeout of 1 second
+    socket.setsockopt(zmq.RCVTIMEO, 1000)
+
+    message = ""
+    while len(message) == 0:
+        try:
+            message = socket.recv_string()
+            print("Received message: %s" % message)
+        except zmq.error.Again as e:
+            print("No message received within timeout period")
 
 def main():
     parser = argparse.ArgumentParser(description='Nodex CLI')
