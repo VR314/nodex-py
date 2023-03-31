@@ -1,3 +1,5 @@
 src/nodex-venv
 *.pyc
 __pycache__/
+dist/
+*.egg-info/

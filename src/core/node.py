@@ -1,5 +1,5 @@
 import enum
-from messaging.connection import Connection
+from .messaging.connection import Connection
 
 class Language(enum.Enum):
     PYTHON = 0
@@ -18,10 +18,15 @@ class Node:
         self.language = language
         self.command = command
         self.args = args
-        self.ports.update({"init": Connection(initPort)})
+        self.ports.update({"init": Connection(f"tcp://0.0.0.0:{initPort}")})
 
     def initializePorts():
         pass
+
+    def initSend(self):
+        self.ports["init"].send("Hello World!")
+        self.ports["init"].send("Hello World!")
+        self.ports["init"].send("10 chars!!")
     
     def __str__(self):
         return f"Node(name={self.name}, language={self.language}, command={self.command}, initPort={self.initPort}, args={self.args})"

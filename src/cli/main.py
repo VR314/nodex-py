@@ -1,18 +1,8 @@
 import argparse
-import os
 import zmq
-
-def is_int(value):
-    try:
-        return int(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError(f"\"{value}\" is not a valid integer")
-    
-def is_file_path(value):
-    path = os.path.dirname(os.path.realpath(__file__)) + "/" + value
-    if (not os.path.isfile(path) and (not os.path.exists(path))):
-        raise argparse.ArgumentTypeError(f"\"{value}\" is not a valid file path")
-    return value
+import json
+from core.node import Node
+from .util import is_file_path
 
 def new_node(args):
     print(f"Creating a new node project with name \"{args.project_name}\"")
@@ -26,27 +16,52 @@ def new_project(args):
 def new_connect(args):
     print(f"Connecting to project with name \"{args.project_name}\"")
 
+def parseNodes(node_names: list):
+    # Create a list of Node objects from the list of node names by parsing the node files
+    nodeFiles = [f"{node_name}/{node_name}.node" for node_name in node_names]
+    nodes = []
+    for nodeFile in nodeFiles:
+        # parse the node file json and create a Node object
+        with open(nodeFile) as f:
+            nodeData = json.load(f)
+            print(nodeData.get("name"), nodeData.get("language"), nodeData.get("command"), nodeData.get("init_port"), nodeData.get("runtime_args"))
+            nodes.append(Node(nodeData.get("name"), nodeData.get("language"), nodeData.get("command"), nodeData.get("init_port"), nodeData.get("runtime_args")))
+    return nodes
+
+# TODO: test multidirectional messaging, create multiple sockets for multiple nodes, use Poller for non-blocking, etc.
 def run_nodes(args):
     print(f"Running nodes: {args.nodes}")
+    
+    nodes = parseNodes(args.nodes)
+    print(nodes)
+
     context = zmq.Context()
 
-    socket = context.socket(zmq.PAIR)
-    socket.bind("tcp://0.0.0.0:4501")  # Bind to a random available port
+    sockets = []
+    
 
-    endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
+    for node in nodes:
+        socket = context.socket(zmq.PAIR)
+        socket.bind(node.ports["init"].endpoint)  # Bind to a random available port
 
-    print("Bound to endpoint from run:", endpoint)
+        endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
 
-    # Set a timeout of 1 second
-    socket.setsockopt(zmq.RCVTIMEO, 1000)
+        print("Bound to endpoint from run:", endpoint)
+
+        # Set a timeout of 1 second
+        socket.setsockopt(zmq.RCVTIMEO, 1000)
+        sockets.append(socket)
+        node.initSend()
+
 
     message = ""
-    while len(message) == 0:
+    while len(message) != 10:
         try:
-            message = socket.recv_string()
-            print("Received message: %s" % message)
+            for socket in sockets:
+                message = socket.recv_string()
+                print("Received message: " + message + " on socket: " + str(socket))
         except zmq.error.Again as e:
-            print("No message received within timeout period")
+            print("No message received within timeout period" + " on socket: " + str(socket))
 
 def main():
     parser = argparse.ArgumentParser(description='Nodex CLI')
@@ -89,12 +104,9 @@ def main():
 
     args = parser.parse_args()
 
-    try:
-        args.func
-        args.func(args)
-    except AttributeError:
-        parser.print_help()
-        parser.error("too few arguments")
+    args.func
+    args.func(args)
 
 if __name__ == '__main__':
     main()
+

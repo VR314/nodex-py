@@ -1,17 +1,17 @@
 import zmq
 
 class Connection:
-    def __init__(self, endpoint):
+    def __init__(self, endpoint:str):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PAIR)        
         if endpoint is None:   
-          endpoint = self.socket.getsockopt(zmq.LAST_ENDPOINT).decode()
+          self.endpoint = self.socket.getsockopt(zmq.LAST_ENDPOINT).decode()
         else: 
           self.endpoint = endpoint
         self.socket.connect(self.endpoint)
         print("Connected to endpoint from connection:", self.endpoint)
 
-    def send(self, message):
+    def send(self, message:str):
         self.socket.send_string(message)
         print("Sent message: " +  message)
 
