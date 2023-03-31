@@ -1,7 +1,6 @@
 import argparse
 import zmq
-import json
-from core.node import Node
+from ..core.node import Node
 from .util import is_file_path
 
 def new_node(args):
@@ -17,18 +16,10 @@ def new_connect(args):
     print(f"Connecting to project with name \"{args.project_name}\"")
 
 def parseNodes(node_names: list):
-    # Create a list of Node objects from the list of node names by parsing the node files
-    nodeFiles = [f"{node_name}/{node_name}.node" for node_name in node_names]
-    nodes = []
-    for nodeFile in nodeFiles:
-        # parse the node file json and create a Node object
-        with open(nodeFile) as f:
-            nodeData = json.load(f)
-            print(nodeData.get("name"), nodeData.get("language"), nodeData.get("command"), nodeData.get("init_port"), nodeData.get("runtime_args"))
-            nodes.append(Node(nodeData.get("name"), nodeData.get("language"), nodeData.get("command"), nodeData.get("init_port"), nodeData.get("runtime_args")))
+    nodes = [Node(node_name) for node_name in node_names]
     return nodes
 
-# TODO: test multidirectional messaging, create multiple sockets for multiple nodes, use Poller for non-blocking, etc.
+# TODO: move this to a publish/subscribe model, try using a Poller object to remove blocking behavior
 def run_nodes(args):
     print(f"Running nodes: {args.nodes}")
     
