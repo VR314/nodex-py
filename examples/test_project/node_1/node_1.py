@@ -1,7 +1,18 @@
 import zmq
+from nodex.core.node import Node
+from nodex.core.logger import Logger
+import os
+
+class MyNode(Node):
+    def __init__(self, node_name):
+        super().__init__(node_name)
 
 def main():
-    print("Hello world!")
+    node_name = os.path.dirname(os.path.realpath(__file__)).split(os.sep)[-1]
+    node = MyNode(node_name)
+    Logger.log(f"Node: {node}")
+    node.initSend()
+
 
 if __name__ == "__main__":
     main()

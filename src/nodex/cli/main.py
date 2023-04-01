@@ -2,6 +2,7 @@ import argparse
 import zmq
 from ..core.node import Node
 from .util import is_file_path
+from ..core.logger import Logger
 
 def new_node(args):
     print(f"Creating a new node project with name \"{args.project_name}\"")
@@ -21,15 +22,12 @@ def parseNodes(node_names: list):
 
 # TODO: move this to a publish/subscribe model, try using a Poller object to remove blocking behavior
 def run_nodes(args):
-    print(f"Running nodes: {args.nodes}")
-    
+    Logger.log(f"Running nodes: {args.nodes}")    
     nodes = parseNodes(args.nodes)
-    print(nodes)
+    Logger.log(nodes)
 
     context = zmq.Context()
-
     sockets = []
-    
 
     for node in nodes:
         socket = context.socket(zmq.PAIR)
@@ -37,12 +35,12 @@ def run_nodes(args):
 
         endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
 
-        print("Bound to endpoint from run:", endpoint)
+        Logger.log("Bound to endpoint from run:" + endpoint)
 
         # Set a timeout of 1 second
         socket.setsockopt(zmq.RCVTIMEO, 1000)
         sockets.append(socket)
-        node.initSend()
+        node.spawn()
 
 
     message = ""
@@ -50,9 +48,9 @@ def run_nodes(args):
         try:
             for socket in sockets:
                 message = socket.recv_string()
-                print("Received message: " + message + " on socket: " + str(socket))
+                Logger.log("Received message: " + message + " on socket: " + str(socket))
         except zmq.error.Again as e:
-            print("No message received within timeout period" + " on socket: " + str(socket))
+            Logger.log("No message received within timeout period" + " on socket: " + str(socket))
 
 def main():
     parser = argparse.ArgumentParser(description='Nodex CLI')

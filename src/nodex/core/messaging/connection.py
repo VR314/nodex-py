@@ -1,4 +1,5 @@
 import zmq
+from ...core.logger import Logger
 
 class Connection:
     def __init__(self, endpoint:str):
@@ -9,11 +10,11 @@ class Connection:
         else: 
           self.endpoint = endpoint
         self.socket.connect(self.endpoint)
-        print("Connected to endpoint from connection:", self.endpoint)
+        Logger.log("Connected to endpoint from connection:" + self.endpoint)
 
     def send(self, message:str):
         self.socket.send_string(message)
-        print("Sent message: " +  message)
+        Logger.log("Sent message: " +  message)
 
     def __str__(self):
         return f"Connection(endpoint={self.endpoint})"
