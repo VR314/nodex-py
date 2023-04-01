@@ -1,7 +1,6 @@
-import zmq
+import os
 from nodex.core.node import Node
 from nodex.core.logger import Logger
-import os
 
 class MyNode(Node):
     def __init__(self, node_name):

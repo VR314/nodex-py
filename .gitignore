@@ -3,3 +3,4 @@ src/nodex-venv
 __pycache__/
 dist/
 *.egg-info/
+build/

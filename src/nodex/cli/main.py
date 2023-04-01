@@ -24,7 +24,7 @@ def parseNodes(node_names: list):
 def run_nodes(args):
     Logger.log(f"Running nodes: {args.nodes}")    
     nodes = parseNodes(args.nodes)
-    Logger.log(nodes)
+    Logger.log(" " + ''.join(str([str(node) for node in nodes])) + " ")
 
     context = zmq.Context()
     sockets = []
@@ -34,14 +34,11 @@ def run_nodes(args):
         socket.bind(node.ports["init"].endpoint)  # Bind to a random available port
 
         endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
-
         Logger.log("Bound to endpoint from run:" + endpoint)
 
-        # Set a timeout of 1 second
         socket.setsockopt(zmq.RCVTIMEO, 1000)
         sockets.append(socket)
         node.spawn()
-
 
     message = ""
     while len(message) != 10:
@@ -54,7 +51,6 @@ def run_nodes(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Nodex CLI')
-
     subparsers = parser.add_subparsers(title='subcommands', dest='command')
 
     # Subparser for "project"
@@ -98,4 +94,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
