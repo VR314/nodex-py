@@ -1,36 +1,47 @@
-import enum
 import json
 import subprocess
-from .connection import Connection
-from ..core.logger import Logger
+
+from nodex.core.topic import Topic
+from nodex.core.lifeline import Lifeline
+from nodex.core.logger import Logger
+
+'''
+First, create the lifeline to the CORE, which is used for updates on lifecycle, errors, etc.
+Then, connect to all topics (PUB/SUB) to receive messages from other nodes. Dynamically open ports as the publishers of the topics come online.
+'''
 
 class Node:
     name = ""
     language = ""
     command = ""
-    ports: dict = {}
+    topics: list[Topic] = []
     args = []
+    lifeline: Lifeline = None
 
     def __init__(self, node_name):
         node_file = f"nodes/{node_name}/{node_name}.node"
         with open(node_file) as f:
-            nodeData = json.load(f)
-            self.name = nodeData.get("name")
-            self.language = nodeData.get("language")
-            self.command = nodeData.get("command")
-            init_port = nodeData.get("init_port")
-            self.ports.update({"init": Connection(f"tcp://0.0.0.0:{init_port}")})
-            self.args = nodeData.get("runtime_args")
+            node_data = json.load(f)
+            self.name = node_data.get("name")
+            self.language = node_data.get("language")
+            self.command = node_data.get("command")
+            init_port = node_data.get("init_port")
+            self.lifeline = Lifeline(f"tcp://0.0.0.0:{init_port}")
+            self.args = node_data.get("runtime_args")
+            topic_dict = node_data.get("topics")
+            for topic in topic_dict:
+                self.topics.append(Topic(topic["name"]))
+
+        Logger.log(self.topics)
 
     def spawn(self):
         string = [self.command] + self.args
         subprocess.Popen(string, shell=True)
 
     def initSend(self):
-        self.ports["init"].send("Hello World!")
-        self.ports["init"].send("Hello World!")
-        self.ports["init"].send("10 chars!!")
+        self.lifeline.send("Hello World!")
+        self.lifeline.send("Hello World!")
+        self.lifeline.send("10 chars!!")
     
     def __str__(self):
-        init_port = self.ports["init"]
-        return f"Node(name={self.name}, language={self.language}, command={self.command}, initPort={init_port}, args={self.args})"
+        return f"Node(name={self.name}, language={self.language}, command={self.command}, initPort={self.lifeline}, args={self.args})"

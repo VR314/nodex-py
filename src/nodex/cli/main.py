@@ -1,8 +1,8 @@
 import argparse
 import zmq
-from ..core.node import Node
-from .util import is_file_path
-from ..core.logger import Logger
+from nodex.core.node import Node
+from nodex.cli.util import is_file_path
+from nodex.core.logger import Logger
 
 def new_node(args):
     print(f"Creating a new node project with name \"{args.project_name}\"")
@@ -24,17 +24,17 @@ def parseNodes(node_names: list):
 def run_nodes(args):
     Logger.log(f"Running nodes: {args.nodes}")    
     nodes = parseNodes(args.nodes)
-    Logger.log(" " + ''.join(str([str(node) for node in nodes])) + " ")
+    # Logger.log(nodes)
 
     context = zmq.Context()
     sockets = []
 
     for node in nodes:
         socket = context.socket(zmq.PAIR)
-        socket.bind(node.ports["init"].endpoint)
+        socket.bind(node.lifeline.endpoint)
 
         endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
-        Logger.log("Bound to endpoint from run:" + endpoint)
+        Logger.log("Bound to endpoint from run: " + endpoint)
 
         socket.setsockopt(zmq.RCVTIMEO, 1000)
         sockets.append(socket)
