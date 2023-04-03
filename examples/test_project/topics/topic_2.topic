@@ -1,7 +1,7 @@
 {
   "name": "topic_1",
   "description": "This is a topic",
-  "id": "998462",
+  "id": "224728",
   "payload_schema": {
     "timestamp": "string",
     "value": "number"

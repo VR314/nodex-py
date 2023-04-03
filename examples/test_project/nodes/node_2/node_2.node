@@ -1,8 +1,18 @@
 {
   "project": "test_project",
   "name": "node_2",
-  "language": "nodejs",
-  "command": "npm start",
+  "language": "python",
+  "command": "python3 nodes/node_2/node_2.py",
   "runtime_args": [],
-  "init_port": 38837
+  "init_port": 44431,
+  "topics": [
+    {
+      "name": "topic_1",
+      "direction": "subscribe"
+    },
+    {
+      "name": "topic_2",
+      "direction": "publish"
+    }
+  ]
 }

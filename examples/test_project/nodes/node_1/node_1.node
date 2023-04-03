@@ -8,12 +8,10 @@
   "topics": [
     {
       "name": "topic_1",
-      "type": "std_msgs/String",
       "direction": "publish"
     },
     {
       "name": "topic_2",
-      "type": "std_msgs/String",
       "direction": "subscribe"
     }
   ]
