@@ -12,7 +12,7 @@ class Node:
     args = []
 
     def __init__(self, node_name):
-        node_file = f"{node_name}/{node_name}.node"
+        node_file = f"nodes/{node_name}/{node_name}.node"
         with open(node_file) as f:
             nodeData = json.load(f)
             self.name = nodeData.get("name")

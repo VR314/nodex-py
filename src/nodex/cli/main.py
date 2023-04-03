@@ -31,7 +31,7 @@ def run_nodes(args):
 
     for node in nodes:
         socket = context.socket(zmq.PAIR)
-        socket.bind(node.ports["init"].endpoint)  # Bind to a random available port
+        socket.bind(node.ports["init"].endpoint)
 
         endpoint = socket.getsockopt(zmq.LAST_ENDPOINT).decode()
         Logger.log("Bound to endpoint from run:" + endpoint)
@@ -89,8 +89,10 @@ def main():
 
     args = parser.parse_args()
 
-    args.func
-    args.func(args)
+    try:
+        args.func(args)
+    except AttributeError:
+        parser.print_help()
 
 if __name__ == '__main__':
     main()
